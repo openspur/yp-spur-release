@@ -1,0 +1,12 @@
+Source: ros-melodic-ypspur
+Section: misc
+Priority: extra
+Maintainer: Atsushi Watanabe <atsushi.w@ieee.org>
+Build-Depends: debhelper (>= 9.0.0), cmake
+Homepage: 
+Standards-Version: 3.9.2
+
+Package: ros-melodic-ypspur
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, ros-melodic-catkin
+Description: YP-Spur is a mobile robot motion control software with coordinate frame based commands.
