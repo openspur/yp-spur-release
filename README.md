@@ -1,3 +1,26 @@
+## yp-spur (indigo) - 1.15.3-0
+
+The packages in the `yp-spur` repository were released into the `indigo` distro by running `/usr/local/bin/bloom-release yp-spur --track indigo --ros-distro indigo` on `Mon, 07 Jan 2019 07:25:37 -0000`
+
+The `ypspur` package was released.
+
+Version of package(s) in repository `yp-spur`:
+
+- upstream repository: https://github.com/openspur/yp-spur.git
+- release repository: https://github.com/openspur/yp-spur-release.git
+- rosdistro version: `1.15.2-0`
+- old version: `1.15.2-0`
+- new version: `1.15.3-0`
+
+Versions of tools used:
+
+- bloom version: `0.6.9`
+- catkin_pkg version: `0.4.9`
+- rosdep version: `0.13.0`
+- rosdistro version: `0.7.0`
+- vcstools version: `0.1.40`
+
+
 ## yp-spur (melodic) - 1.15.2-0
 
 The packages in the `yp-spur` repository were released into the `melodic` distro by running `/usr/local/bin/bloom-release yp-spur --track melodic --ros-distro melodic` on `Thu, 07 Jun 2018 03:39:11 -0000`
