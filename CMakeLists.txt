@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8.3)
 
 set(_YPSPUR_MAJOR_VERSION 1)
 set(_YPSPUR_MINOR_VERSION 15)
-set(_YPSPUR_PATCH_VERSION 2)
+set(_YPSPUR_PATCH_VERSION 3)
 
 if(${CMAKE_MAJOR_VERSION} LESS 3)
 # DARN_IT: CMake 2 should be supported until April, 2019 (Ubuntu Trusty EOL)
@@ -50,7 +50,6 @@ if(CMAKE_THREAD_LIBS_INIT)
   set(THREAD_LIBRARIES ${CMAKE_THREAD_LIBS_INIT} ${THREAD_LIBRARIES})
 endif(CMAKE_THREAD_LIBS_INIT)
 
-
 find_package(PkgConfig)
 if(PKGCONFIG_FOUND)
   set(HAVE_PKG_CONFIG 1)
@@ -60,11 +59,10 @@ if(USE_SSM)
   find_package(SSM)
 endif(USE_SSM)
 
-set(READLINE_LIBRARIES "")
-find_library(READLINE_LIBRARIES readline)
-if(READLINE_LIBRARIES )
+find_package(Readline)
+if(READLINE_FOUND)
   add_definitions(-DHAVE_LIBREADLINE=1)
-endif(READLINE_LIBRARIES )
+endif(READLINE_FOUND)
 
 include(CheckFunctionExists)
 check_function_exists(longjmp HAVE_LONGJMP)
@@ -74,6 +72,8 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cmake/config.h.cmake
   ${CMAKE_CURRENT_BINARY_DIR}/include/config.h
 )
 add_definitions(-DHAVE_CONFIG_H=1)
+
+find_package(GTest)
 
 
 # Set include dirs
@@ -106,6 +106,33 @@ endif(ENABLE_ALL_STATIC)
 
 add_subdirectory(auxlib)
 add_subdirectory(samples)
+
+
+# Enable gtest
+
+if(GTEST_FOUND)
+  enable_testing()
+
+  add_executable(param_load_test
+    test/param_load.cpp
+    src/adinput.c
+    src/communication.c
+    src/odometry.c
+    src/param.c
+    src/serial.c
+    src/ssm_spur_handler.c
+    src/utility.c
+    src/yprintf.c
+  )
+  target_link_libraries(param_load_test
+    ${GTEST_LIBRARIES}
+    ${THREAD_LIBRARIES}
+    carte2d${TARGET_STATIC_POSTFIX}
+    formula-calc${TARGET_STATIC_POSTFIX}
+  )
+
+  add_test(YPSpurParamTest param_load_test)
+endif(GTEST_FOUND)
 
 
 # Build coordinator and utilities
