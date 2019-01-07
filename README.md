@@ -1,3 +1,26 @@
+## yp-spur (lunar) - 1.15.3-0
+
+The packages in the `yp-spur` repository were released into the `lunar` distro by running `/usr/local/bin/bloom-release yp-spur --track lunar --ros-distro lunar` on `Mon, 07 Jan 2019 07:55:56 -0000`
+
+The `ypspur` package was released.
+
+Version of package(s) in repository `yp-spur`:
+
+- upstream repository: https://github.com/openspur/yp-spur.git
+- release repository: https://github.com/openspur/yp-spur-release.git
+- rosdistro version: `1.15.2-0`
+- old version: `1.15.2-0`
+- new version: `1.15.3-0`
+
+Versions of tools used:
+
+- bloom version: `0.6.9`
+- catkin_pkg version: `0.4.9`
+- rosdep version: `0.13.0`
+- rosdistro version: `0.7.0`
+- vcstools version: `0.1.40`
+
+
 ## yp-spur (kinetic) - 1.15.3-0
 
 The packages in the `yp-spur` repository were released into the `kinetic` distro by running `/usr/local/bin/bloom-release yp-spur --track kinetic --ros-distro kinetic` on `Mon, 07 Jan 2019 07:49:58 -0000`
