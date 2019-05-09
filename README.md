@@ -1,3 +1,26 @@
+## yp-spur (kinetic) - 1.16.0-1
+
+The packages in the `yp-spur` repository were released into the `kinetic` distro by running `/usr/local/bin/bloom-release yp-spur --track kinetic --ros-distro kinetic` on `Thu, 09 May 2019 11:03:53 -0000`
+
+The `ypspur` package was released.
+
+Version of package(s) in repository `yp-spur`:
+
+- upstream repository: https://github.com/openspur/yp-spur.git
+- release repository: https://github.com/openspur/yp-spur-release.git
+- rosdistro version: `1.15.3-0`
+- old version: `1.15.3-0`
+- new version: `1.16.0-1`
+
+Versions of tools used:
+
+- bloom version: `0.8.0`
+- catkin_pkg version: `0.4.12`
+- rosdep version: `0.15.1`
+- rosdistro version: `0.7.4`
+- vcstools version: `0.1.40`
+
+
 ## yp-spur (melodic) - 1.15.3-0
 
 The packages in the `yp-spur` repository were released into the `melodic` distro by running `/usr/local/bin/bloom-release yp-spur --track melodic --ros-distro melodic` on `Mon, 07 Jan 2019 08:05:53 -0000`
