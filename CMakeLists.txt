@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 2.8.3)
 
 set(_YPSPUR_MAJOR_VERSION 1)
-set(_YPSPUR_MINOR_VERSION 15)
-set(_YPSPUR_PATCH_VERSION 3)
+set(_YPSPUR_MINOR_VERSION 16)
+set(_YPSPUR_PATCH_VERSION 0)
 
 if(${CMAKE_MAJOR_VERSION} LESS 3)
 # DARN_IT: CMake 2 should be supported until April, 2019 (Ubuntu Trusty EOL)
@@ -27,7 +27,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake/mod
 
 set(YP_VENDOR_NAME "OpenSpur.org")
 set(YP_PRODUCT_NAME "Yamabico Project - Spur")
-set(YP_PROTOCOL_NAME "YPP:09:03")
+set(YP_PROTOCOL_NAME "YPP:10:04")
 set(YP_PARAMS_DIR "robot-params")
 
 option(USE_SSM "Compile with SSM if available." ON)
@@ -139,7 +139,7 @@ endif(GTEST_FOUND)
 
 add_executable(ypspur-coordinator
   src/adinput.c
-  src/command_ad.c
+  src/command_aux.c
   src/command.c
   src/command_get.c
   src/command_joint.c
@@ -210,6 +210,11 @@ add_library(ypspur SHARED
   src/yprintf.c
   src/utility.c
 )
+
+add_library(ypspur-comm SHARED
+  src/communication.c
+)
+
 if(WIN32)
   target_link_libraries(ypspur wsock32 ws2_32)
 endif(WIN32)
@@ -274,6 +279,7 @@ set_target_properties(ypspur-md-static PROPERTIES
 install(TARGETS
     ypspur-coordinator
     ypspur
+    ypspur-comm
     ypspur-static
     ypspur-md
     ypspur-md-static
@@ -288,6 +294,10 @@ install(TARGETS
 install(FILES include/yp-spur.h
   DESTINATION include
 )
+install(FILES include/communication.h
+  DESTINATION include/ypspur
+)
+
 if(SSM_FOUND)
   install(DIRECTORY
       include/ssmtype
@@ -324,4 +334,21 @@ install(
     ${PROJECT_BINARY_DIR}/cmake/ypspur/ypspur-config-version.cmake
     package.xml
   DESTINATION share/ypspur/
+)
+
+
+# Generate pkgconfig file and install
+
+configure_file(ypspur.pc.in
+  ${PROJECT_BINARY_DIR}/ypspur.pc @ONLY
+)
+
+set(
+  PKGCONFIG_INSTALL_DIR ${CMAKE_INSTALL_PREFIX}/share/pkgconfig
+  CACHE PATH "Install directory of pkgconfig file"
+)
+install(
+  FILES
+    ${PROJECT_BINARY_DIR}/ypspur.pc
+  DESTINATION ${PKGCONFIG_INSTALL_DIR}
 )
