@@ -288,9 +288,12 @@ int serial_change_baudrate(int baud)
     }
   }  // <--- check bit rate
 
-  ret = write(g_device_port, "\n\nVV\n\n", 6);
-  yp_usleep(10000);
-  serial_recieve(recieve_throw, buf);
+  if (!(option(OPTION_DO_NOT_USE_YP)))
+  {
+    ret = write(g_device_port, "\n\nVV\n\n", 6);
+    yp_usleep(10000);
+    serial_recieve(recieve_throw, buf);
+  }
 #else
   // Windows用
   DCB dcb;
@@ -442,8 +445,15 @@ int serial_recieve(int (*serial_event)(char *, int, double, void *), void *data)
     struct timeval tv;
     size_t len;
 
-    tv.tv_sec = 0;
-    tv.tv_usec = 200000;
+    // [s] -> [us]
+    long long int timeout_us = p(YP_PARAM_DEVICE_TIMEOUT, 0) * 1000000;
+    if (timeout_us == 0)
+    {
+      // Default timeout before loading parameter file.
+      timeout_us = 200000;
+    }
+    tv.tv_sec = timeout_us / 1000000;
+    tv.tv_usec = timeout_us % 1000000;
     FD_ZERO(&rfds);
     FD_SET(g_device_port, &rfds);
 
@@ -523,6 +533,25 @@ int encode_write(char *data, int len)
   int encode_len, ret;
 
   buf[0] = COMMUNICATION_START_BYTE;
+  encode_len = encode((unsigned char *)data, len, buf + 1, 126);
+  buf[encode_len + 1] = COMMUNICATION_END_BYTE;
+
+  ret = serial_write((char *)buf, encode_len + 2);
+  if (ret <= 0)
+  {
+    return -1;
+  }
+  serial_flush_out();
+
+  return 0;
+}
+
+int encode_int_write(char *data, int len)
+{
+  unsigned char buf[128];
+  int encode_len, ret;
+
+  buf[0] = COMMUNICATION_INT_BYTE;
   encode_len = encode((unsigned char *)data, len, buf + 1, 126);
   buf[encode_len + 1] = COMMUNICATION_END_BYTE;
 
