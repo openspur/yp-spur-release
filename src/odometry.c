@@ -96,6 +96,7 @@ void init_odometry(void)
   g_odometry.v = 0;
   g_odometry.w = 0;
   g_odometry.time = 0;
+  g_odometry.packet_lost = 0;
   g_offset_point = 0;
 }
 
@@ -250,14 +251,14 @@ void process_int(
   Parameters *param;
   param = get_param_ptr();
 
-  if (!param->motor_enable[id])
-    return;
-
   switch (param_id)
   {
     case INT_enc_index_rise:
     case INT_enc_index_fall:
     {
+      if (id >= YP_PARAM_MAX_MOTOR_NUM || !param->motor_enable[id])
+        return;
+
       // enc == value のときに INDEX_RISE/FALL_ANGLE [rad] だった
       const unsigned short enc_div =
           ((unsigned int)xp->enc[id] << ((int)p(YP_PARAM_ENCODER_DIV, id))) & 0xFFFF;
@@ -289,6 +290,9 @@ void process_int(
     }
     case INT_error_state:
     {
+      if (id >= YP_PARAM_MAX_MOTOR_NUM || !param->motor_enable[id])
+        return;
+
       if (err->state[id] != value)
       {
         if (value == ERROR_NONE)
@@ -319,8 +323,20 @@ void process_int(
       err->time[id] = receive_time;
       break;
     }
+    case INT_ping_response:
+      if (id == MOTOR_ID_BROADCAST)
+      {
+        xp->ping_response[YP_PARAM_MAX_MOTOR_NUM] = value;
+        yprintf(OUTPUT_LV_INFO, "Ping response received: broadcast, 0x%08x\n", value);
+      }
+      else
+      {
+        xp->ping_response[id] = value;
+        yprintf(OUTPUT_LV_INFO, "Ping response received: %d, 0x%08x\n", id, value);
+      }
+      break;
     default:
-      yprintf(OUTPUT_LV_ERROR, "Error: Unknown interrput data (%d, %d, %d)\n", param_id, id, value);
+      yprintf(OUTPUT_LV_ERROR, "Error: Unknown interrupt data (%d, %d, %d)\n", param_id, id, value);
       break;
   }
 }
@@ -405,10 +421,19 @@ double time_synchronize(double receive_time, int readnum, int wp)
   const int lost = lround(error / g_interval);
   if (lost != 0)
   {
+    g_odometry.packet_lost += lost;
     if (option(OPTION_SHOW_TIMESTAMP))
-      printf("%d packet(s) might be lost!\n", lost);
+      yprintf(OUTPUT_LV_WARNING, "%d packets might be lost!\n", lost);
+
     error -= lost * g_interval;
     g_offset_point -= lost;
+  }
+  else if (g_odometry.packet_lost_last != g_odometry.packet_lost)
+  {
+    // Discard lost=+1/-1 as a jitter.
+    if (abs(g_odometry.packet_lost_last - g_odometry.packet_lost) > 1)
+      yprintf(OUTPUT_LV_ERROR, "Error: total packet lost: %d\n", g_odometry.packet_lost);
+    g_odometry.packet_lost_last = g_odometry.packet_lost;
   }
 
   static double error_integ = 0;
