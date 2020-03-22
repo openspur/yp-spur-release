@@ -152,6 +152,7 @@ void arg_longhelp(int argc, char *argv[])
   fprintf(stderr, "  --ssm-id <SSMID>         Change ssm id (default = 0).\n");
   fprintf(stderr, "  --socket <port>          Use socket ipc.\n");
   fprintf(stderr, "  --daemon                 Run in daemon mode.\n");
+  fprintf(stderr, "  --ping                   Ping RS485 chained devices.\n");
 }
 
 /* 引数の説明 */
@@ -197,6 +198,10 @@ int arg_analyze(int argc, char *argv[])
     else if (!strcmp(argv[i], "--daemon"))
     {
       g_param.option |= OPTION_DAEMON;
+    }
+    else if (!strcmp(argv[i], "--ping"))
+    {
+      g_param.option |= OPTION_PING;
     }
     else if (!strcmp(argv[i], "--param-help"))
     {
@@ -898,6 +903,12 @@ int set_paramptr(FILE *paramfile)
         g_P_changed[YP_PARAM_ENCODER_DENOMINATOR][j] = 1;
       g_P[YP_PARAM_ENCODER_DENOMINATOR][j] = 1.0;
     }
+    if (!g_P_set[YP_PARAM_DEVICE_TIMEOUT][j])
+    {
+      // YP_PARAM_DEVICE_TIMEOUT is always sent on reloading.
+      // g_P_changed is not needed to be marked.
+      g_P[YP_PARAM_DEVICE_TIMEOUT][j] = 0.3;
+    }
 
     // Process internally calculated parameters
     g_P[YP_PARAM_TORQUE_UNIT][j] = 1.0 / g_P[YP_PARAM_TORQUE_FINENESS][j];
@@ -1506,7 +1517,8 @@ int set_param_velocity(void)
   {
     if (!g_param.motor_enable[j])
       continue;
-    parameter_set(PARAM_watch_dog_limit, j, 300);
+    // [s] -> [ms]
+    parameter_set(PARAM_watch_dog_limit, j, g_P[YP_PARAM_DEVICE_TIMEOUT][j] * 1000);
   }
   return 1;
 }
