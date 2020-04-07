@@ -1,3 +1,26 @@
+## yp-spur (noetic) - 1.18.1-1
+
+The packages in the `yp-spur` repository were released into the `noetic` distro by running `/usr/local/bin/bloom-release yp-spur --track noetic --ros-distro noetic` on `Tue, 07 Apr 2020 02:03:53 -0000`
+
+The `ypspur` package was released.
+
+Version of package(s) in repository `yp-spur`:
+
+- upstream repository: https://github.com/openspur/yp-spur.git
+- release repository: unknown
+- rosdistro version: `null`
+- old version: `null`
+- new version: `1.18.1-1`
+
+Versions of tools used:
+
+- bloom version: `0.9.3`
+- catkin_pkg version: `0.4.16`
+- rosdep version: `0.18.0`
+- rosdistro version: `0.8.0`
+- vcstools version: `0.1.42`
+
+
 ## yp-spur (melodic) - 1.18.1-1
 
 The packages in the `yp-spur` repository were released into the `melodic` distro by running `/usr/local/bin/bloom-release yp-spur --track melodic --ros-distro melodic` on `Tue, 07 Apr 2020 01:51:31 -0000`
