@@ -1,3 +1,4 @@
+release_repo_url: https://github.com/openspur/yp-spur-release.git
 tracks:
   indigo:
     actions:
