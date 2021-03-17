@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8.3)
 
 set(_YPSPUR_MAJOR_VERSION 1)
 set(_YPSPUR_MINOR_VERSION 20)
-set(_YPSPUR_PATCH_VERSION 1)
+set(_YPSPUR_PATCH_VERSION 2)
 
 if(${CMAKE_MAJOR_VERSION} LESS 3)
 # DARN_IT: CMake 2 should be supported until April, 2019 (Ubuntu Trusty EOL)
@@ -113,19 +113,6 @@ add_subdirectory(samples)
 if(GTEST_FOUND)
   enable_testing()
 
-  set(CTEST_ENVIRONMENT CTEST_OUTPUT_ON_FAILURE=1)
-
-  include(CheckCXXCompilerFlag)
-  check_cxx_compiler_flag("-std=c++11" COMPILER_SUPPORTS_CXX11)
-  check_cxx_compiler_flag("-std=c++0x" COMPILER_SUPPORTS_CXX0X)
-  if(COMPILER_SUPPORTS_CXX11)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-  elseif(COMPILER_SUPPORTS_CXX0X)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
-  else()
-    message(FATAL_ERROR "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
-  endif()
-
   add_executable(param_load_test
     test/param_load.cpp
     src/adinput.c
@@ -143,26 +130,8 @@ if(GTEST_FOUND)
     carte2d${TARGET_STATIC_POSTFIX}
     formula-calc${TARGET_STATIC_POSTFIX}
   )
-  add_test(YPSpurParamTest param_load_test)
 
-  add_executable(time_synchronize_test
-    test/time_synchronize.cpp
-    src/adinput.c
-    src/communication.c
-    src/odometry.c
-    src/param.c
-    src/serial.c
-    src/ssm_spur_handler.c
-    src/utility.c
-    src/yprintf.c
-  )
-  target_link_libraries(time_synchronize_test
-    ${GTEST_LIBRARIES}
-    ${THREAD_LIBRARIES}
-    carte2d${TARGET_STATIC_POSTFIX}
-    formula-calc${TARGET_STATIC_POSTFIX}
-  )
-add_test(YPSpurTimeSynchronize time_synchronize_test)
+  add_test(YPSpurParamTest param_load_test)
 endif(GTEST_FOUND)
 
 
