@@ -454,6 +454,17 @@ double gravity_compensation(OdometryPtr odm, SpurUserParamsPtr spur)
 
 void control_loop_cleanup(void* data)
 {
+  int i;
+  ParametersPtr param = get_param_ptr();
+
+  for (i = 0; i < YP_PARAM_MAX_MOTOR_NUM; i++)
+  {
+    if (param->motor_enable[i])
+    {
+      parameter_set(PARAM_servo, i, SERVO_LEVEL_STOP);
+    }
+  }
+
   yprintf(OUTPUT_LV_INFO, "Trajectory control loop stopped.\n");
 }
 
@@ -503,39 +514,45 @@ void control_loop(void)
   yprintf(OUTPUT_LV_INFO, "Trajectory control loop started.\n");
   pthread_cleanup_push(control_loop_cleanup, NULL);
 
-#if defined(HAVE_LIBRT)  // clock_nanosleepが利用可能
+  double last_time = get_time();
+
+#if defined(HAVE_CLOCK_NANOSLEEP)  // clock_nanosleepが利用可能
   struct timespec request;
 
   if (clock_gettime(CLOCK_MONOTONIC, &request) == -1)
   {
-    yprintf(OUTPUT_LV_ERROR, "error on clock_gettime\n");
-    exit(0);
+    yprintf(OUTPUT_LV_ERROR, "Error on clock_gettime\n");
+    static int status = EXIT_FAILURE;
+    pthread_exit(&status);
   }
+#endif  // defined(HAVE_CLOCK_NANOSLEEP)
   while (1)
   {
+#if defined(HAVE_CLOCK_NANOSLEEP)  // clock_nanosleepが利用可能
     request.tv_nsec += (p(YP_PARAM_CONTROL_CYCLE, 0) * 1000000000);
     request.tv_sec += request.tv_nsec / 1000000000;
     request.tv_nsec = request.tv_nsec % 1000000000;
 
     clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &request, 0);
-    coordinate_synchronize(odometry, spur);
-    run_control(*odometry, spur);
+#else
+    yp_usleep(p(YP_PARAM_CONTROL_CYCLE, 0) * 1000000);
+#endif  // defined(HAVE_CLOCK_NANOSLEEP)
 
-    if ((option(OPTION_WITHOUT_DEVICE)))
+    if ((option(OPTION_EXIT_ON_TIME_JUMP)))
     {
-      simulate_control(*odometry, spur);
+      const double now = get_time();
+      const double dt = now - last_time;
+      const double expected_dt = p(YP_PARAM_CONTROL_CYCLE, 0);
+      const double dt_error = dt - expected_dt;
+      last_time = now;
+      if (dt_error < -expected_dt || expected_dt < dt_error)
+      {
+        yprintf(OUTPUT_LV_ERROR, "Detected system time jump: %0.5fs\n", dt_error);
+        static int status = EXIT_FAILURE;
+        pthread_exit(&status);
+      }
     }
 
-    // スレッドの停止要求チェック
-    pthread_testcancel();
-  }
-#else
-  int request;
-  request = (p(YP_PARAM_CONTROL_CYCLE, 0) * 1000000);
-
-  while (1)
-  {
-    yp_usleep(request);
     coordinate_synchronize(odometry, spur);
     run_control(*odometry, spur);
 
@@ -547,7 +564,6 @@ void control_loop(void)
     // スレッドの停止要求チェック
     pthread_testcancel();
   }
-#endif  // defined(HAVE_LIBRT)
   pthread_cleanup_pop(1);
 }
 
