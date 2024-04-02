@@ -1,3 +1,26 @@
+## yp-spur (noetic) - 1.22.0-1
+
+The packages in the `yp-spur` repository were released into the `noetic` distro by running `/usr/bin/bloom-release -y --no-web --ros-distro noetic --override-release-repository-push-url https://github.com/openspur/yp-spur-release.git --debug yp-spur` on `Tue, 02 Apr 2024 06:33:39 -0000`
+
+The `ypspur` package was released.
+
+Version of package(s) in repository `yp-spur`:
+
+- upstream repository: https://github.com/openspur/yp-spur.git
+- release repository: https://github.com/openspur/yp-spur-release.git
+- rosdistro version: `1.21.0-1`
+- old version: `1.21.0-1`
+- new version: `1.22.0-1`
+
+Versions of tools used:
+
+- bloom version: `0.11.2`
+- catkin_pkg version: `1.0.0`
+- rosdep version: `0.22.2`
+- rosdistro version: `0.9.0`
+- vcstools version: `0.1.42`
+
+
 ## yp-spur (noetic) - 1.21.0-1
 
 The packages in the `yp-spur` repository were released into the `noetic` distro by running `/usr/bin/bloom-release -y --no-web --ros-distro noetic --override-release-repository-push-url https://github.com/openspur/yp-spur-release.git --debug yp-spur` on `Fri, 22 Mar 2024 06:30:07 -0000`
